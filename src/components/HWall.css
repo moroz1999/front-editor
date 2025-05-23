@@ -1,0 +1,16 @@
+.h-wall {
+    min-width: 0;
+    height: var(--wall-thickness);
+    width: var(--h-wall-width);
+    border: var(--cell-border);
+    background-size: 100% 100%;
+    box-sizing: border-box;
+    transform: skewX(-45deg);
+    position: relative;
+    z-index: 3;
+    left: calc(var(--wall-thickness) / -2);
+}
+
+.h-mirrored {
+    transform: skewX(-45deg) scaleX(-1);
+}

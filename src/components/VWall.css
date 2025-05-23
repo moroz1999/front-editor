@@ -1,0 +1,16 @@
+.v-wall {
+    width: var(--wall-thickness);
+    border: var(--cell-border);
+    background-size: 100% 100%;
+    box-sizing: border-box;
+    transform: skewY(-45deg);
+    margin-left: calc(0px - var(--wall-thickness));
+    position: relative;
+    z-index: 2;
+    top: calc(var(--wall-thickness) / 2);
+
+}
+
+.v-mirrored {
+    transform: skewY(-45deg) scaleY(-1);
+}

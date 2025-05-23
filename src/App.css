@@ -1,30 +1,43 @@
+
+:root {
+    --wall-thickness: 24px;
+    --h-wall-gap: var(--wall-thickness);
+    --cell-size: 64px;
+    --h-wall-width: var(--cell-size);
+    --cell-border: 1px solid #808080;
+}
+body {
+    margin: 0;
+    padding: 0;
+}
 .app {
-  display: flex;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .editor {
-  width: 80%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    width: 80%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
 }
 
 .sidebar {
-  width: 20%;
-  height: 100%;
-  padding: 10px;
-  box-sizing: border-box;
-  overflow-y: auto;
+    width: 20%;
+    height: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
 .controls {
-  margin-top: 20px;
+    margin-top: 20px;
 }
 
 .controls button {
-  margin-right: 10px;
+    margin-right: 10px;
 }

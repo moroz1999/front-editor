@@ -1,9 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, {useState, useRef, useEffect} from 'react';
+import Cell from './Cell';
+import HWall from './HWall';
+import VWall from './VWall';
 import './MapEditor.css';
 
-interface Cell {
-    texture: string | null;
-    mirror: boolean;
+interface CellData {
     object: string | null;
 }
 
@@ -16,14 +17,14 @@ const MapEditor: React.FC<{ selectedTexture: string | null; selectedObject: stri
                                                                                                     selectedTexture,
                                                                                                     selectedObject,
                                                                                                 }) => {
-    const [map, setMap] = useState<Cell[][]>(
+    const [map, setMap] = useState<CellData[][]>(
         Array(32).fill(null).map(() =>
-            Array(32).fill(null).map(() => ({ texture: null, mirror: false, object: null }))
-        )
+            Array(32).fill(null).map(() => ({object: null})),
+        ),
     );
     const [walls, setWalls] = useState<Wall[][][]>([
-        Array(32).fill(null).map(() => Array(31).fill(null).map(() => ({ texture: null, mirror: false }))), // Вертикальные
-        Array(31).fill(null).map(() => Array(32).fill(null).map(() => ({ texture: null, mirror: false }))), // Горизонтальные
+        Array(32).fill(null).map(() => Array(31).fill(null).map(() => ({texture: null, mirror: false}))), // Вертикальные
+        Array(32).fill(null).map(() => Array(32).fill(null).map(() => ({texture: null, mirror: false}))), // Горизонтальные
     ]);
     const isMouseDown = useRef(false);
 
@@ -32,40 +33,44 @@ const MapEditor: React.FC<{ selectedTexture: string | null; selectedObject: stri
             setWalls((prev) => {
                 const newWalls = [...prev];
                 if (newWalls[0][y][x].texture === selectedTexture) {
-                    newWalls[0][y][x] = { ...newWalls[0][y][x], mirror: !newWalls[0][y][x].mirror };
+                    newWalls[0][y][x] = {...newWalls[0][y][x], mirror: !newWalls[0][y][x].mirror};
                 } else {
-                    newWalls[0][y][x] = { texture: selectedTexture, mirror: false };
+                    newWalls[0][y][x] = {texture: selectedTexture, mirror: false};
                 }
                 return newWalls;
             });
-        } else if (type === 'hWall' && selectedTexture && y < 31) {
+        } else if (type === 'hWall' && selectedTexture) {
             setWalls((prev) => {
                 const newWalls = [...prev];
                 if (newWalls[1][y][x].texture === selectedTexture) {
-                    newWalls[1][y][x] = { ...newWalls[1][y][x], mirror: !newWalls[1][y][x].mirror };
+                    newWalls[1][y][x] = {...newWalls[1][y][x], mirror: !newWalls[1][y][x].mirror};
                 } else {
-                    newWalls[1][y][x] = { texture: selectedTexture, mirror: false };
+                    newWalls[1][y][x] = {texture: selectedTexture, mirror: false};
                 }
                 return newWalls;
             });
         } else if (type === 'cell' && selectedObject) {
             setMap((prev) => {
                 const newMap = [...prev];
-                newMap[y][x] = { ...newMap[y][x], object: selectedObject };
+                newMap[y][x] = {...newMap[y][x], object: selectedObject};
                 return newMap;
             });
         }
     };
 
-    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>, x: number, y: number, type: 'cell' | 'vWall' | 'hWall') => {
-        isMouseDown.current = true;
-        handleMouseAction(e, x, y, type);
+    const handleMouseDown = (x: number, y: number, type: 'cell' | 'vWall' | 'hWall') => {
+        return (e: React.MouseEvent<HTMLDivElement>) => {
+            isMouseDown.current = true;
+            handleMouseAction(e, x, y, type);
+        };
     };
 
-    const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>, x: number, y: number, type: 'cell' | 'vWall' | 'hWall') => {
-        if (isMouseDown.current) {
-            handleMouseAction(e, x, y, type);
-        }
+    const handleMouseEnter = (x: number, y: number, type: 'cell' | 'vWall' | 'hWall') => {
+        return (e: React.MouseEvent<HTMLDivElement>) => {
+            if (isMouseDown.current) {
+                handleMouseAction(e, x, y, type);
+            }
+        };
     };
 
     const handleMouseUp = () => {
@@ -73,8 +78,8 @@ const MapEditor: React.FC<{ selectedTexture: string | null; selectedObject: stri
     };
 
     const saveMap = () => {
-        const data = { map, walls };
-        const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+        const data = {map, walls};
+        const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -106,63 +111,43 @@ const MapEditor: React.FC<{ selectedTexture: string | null; selectedObject: stri
             <div className="grid">
                 {Array(32).fill(null).map((_, y) => (
                     <React.Fragment key={`row-${y}`}>
+                        <div className="h-wall-row">
+                            {Array(32).fill(null).map((_, x) => (
+                                <HWall
+                                    key={`h-wall-${x}-${y}`}
+                                    texture={walls[1][y][x].texture}
+                                    mirror={walls[1][y][x].mirror}
+                                    onMouseDown={handleMouseDown(x, y, 'hWall')}
+                                    onMouseEnter={handleMouseEnter(x, y, 'hWall')}
+                                />
+                            ))}
+                        </div>
                         <div className="row">
                             {Array(32).fill(null).map((_, x) => (
                                 <React.Fragment key={`cell-${x}-${y}`}>
-                                    <div
-                                        className="cell"
-                                        onMouseDown={(e) => handleMouseDown(e, x, y, 'cell')}
-                                        onMouseEnter={(e) => handleMouseEnter(e, x, y, 'cell')}
-                                    >
-                                        {map[y][x].object && (
-                                            <div
-                                                className="object"
-                                                style={{
-                                                    backgroundImage: `url(/objects/${map[y][x].object})`,
-                                                    backgroundSize: 'cover',
-                                                }}
-                                            />
-                                        )}
-                                    </div>
+                                    <Cell
+                                        object={map[y][x].object}
+                                        onMouseDown={handleMouseDown(x, y, 'cell')}
+                                        onMouseEnter={handleMouseEnter(x, y, 'cell')}
+                                    />
                                     {x < 31 && (
-                                        <div
-                                            className="v-wall"
-                                            style={{
-                                                backgroundImage: walls[0][y][x].texture ? `url(/textures/${walls[0][y][x].texture})` : undefined,
-                                                backgroundSize: 'cover',
-                                                transform: walls[0][y][x].mirror ? 'scaleX(-1)' : undefined,
-                                            }}
-                                            onMouseDown={(e) => handleMouseDown(e, x, y, 'vWall')}
-                                            onMouseEnter={(e) => handleMouseEnter(e, x, y, 'vWall')}
+                                        <VWall
+                                            texture={walls[0][y][x].texture}
+                                            mirror={walls[0][y][x].mirror}
+                                            onMouseDown={handleMouseDown(x, y, 'vWall')}
+                                            onMouseEnter={handleMouseEnter(x, y, 'vWall')}
                                         />
                                     )}
                                 </React.Fragment>
                             ))}
                         </div>
-                        {y < 31 && (
-                            <div className="h-wall-row">
-                                {Array(32).fill(null).map((_, x) => (
-                                    <div
-                                        key={`h-wall-${x}-${y}`}
-                                        className="h-wall"
-                                        style={{
-                                            backgroundImage: walls[1][y][x].texture ? `url(/textures/${walls[1][y][x].texture})` : undefined,
-                                            backgroundSize: 'cover',
-                                            transform: walls[1][y][x].mirror ? 'scaleX(-1)' : undefined,
-                                        }}
-                                        onMouseDown={(e) => handleMouseDown(e, x, y, 'hWall')}
-                                        onMouseEnter={(e) => handleMouseEnter(e, x, y, 'hWall')}
-                                    />
-                                ))}
-                            </div>
-                        )}
                     </React.Fragment>
                 ))}
             </div>
             <input
                 type="file"
                 accept=".json"
-                style={{ display: 'none' }}
+                style={{display: 'none'}}
                 onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {

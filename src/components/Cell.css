@@ -1,0 +1,16 @@
+.cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    position: relative;
+    box-sizing: border-box;
+    z-index: 1;
+}
+
+.object {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: var(--wall-thickness);
+    top: var(--wall-thickness);
+    background-size: cover;
+}
