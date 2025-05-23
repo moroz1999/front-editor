@@ -1,0 +1,17 @@
+.object-selector {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.object-selector img {
+    width: 100%;
+    height: auto;
+    cursor: pointer;
+}
+
+.object-selector img.selected {
+    border: 2px solid red;
+}
