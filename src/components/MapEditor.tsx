@@ -8,7 +8,7 @@ interface CellData {
     object: string | null;
 }
 
-interface Wall {
+interface WallState {
     texture: string | null;
     mirror: boolean;
 }
@@ -18,102 +18,103 @@ interface MapEditorProps {
     selectedObject: string | null;
 }
 
+type WallType = 'vWall' | 'hWall';
+type ElementType = 'cell' | WallType;
+
+
 const MapEditor: React.FC<MapEditorProps> = ({
                                                  selectedTexture,
                                                  selectedObject,
                                              }) => {
     const [map, setMap] = useState<CellData[][]>(
         Array(32).fill(null).map(() =>
-      Array(32).fill(null).map(() => ({ object: null }))
-    )
+            Array(32).fill(null).map(() => ({object: null})),
+        ),
     );
-    const [walls, setWalls] = useState<Wall[][][]>([
+    const [walls, setWalls] = useState<WallState[][][]>([
         Array(32).fill(null).map(() => Array(31).fill(null).map(() => ({texture: null, mirror: false}))), // Вертикальные
         Array(32).fill(null).map(() => Array(32).fill(null).map(() => ({texture: null, mirror: false}))), // Горизонтальные
     ]);
     const isMouseDown = useRef(false);
 
-    const handleMouseDownAction = (e: React.MouseEvent<HTMLDivElement>, x: number, y: number, type: 'cell' | 'vWall' | 'hWall') => {
-        if (e.button === 0) {
-            // Левая кнопка: установка текстуры/объекта
-            if (type === 'vWall' && selectedTexture && x < 31) {
-                setWalls((prev) => {
-                    const newWalls = [...prev];
-                    if (newWalls[0][y][x].texture === selectedTexture && newWalls[0][y][x].texture !== null) {
-                        newWalls[0][y][x] = {...newWalls[0][y][x], mirror: !newWalls[0][y][x].mirror};
-                    } else {
-                        newWalls[0][y][x] = {texture: selectedTexture, mirror: false};
-                    }
-                    return newWalls;
-                });
-            } else if (type === 'hWall' && selectedTexture) {
-                setWalls((prev) => {
-                    const newWalls = [...prev];
-                    if (newWalls[1][y][x].texture === selectedTexture && newWalls[1][y][x].texture !== null) {
-                        newWalls[1][y][x] = {...newWalls[1][y][x], mirror: !newWalls[1][y][x].mirror};
-                    } else {
-                        newWalls[1][y][x] = {texture: selectedTexture, mirror: false};
-                    }
-                    return newWalls;
-                });
-            } else if (type === 'cell' && selectedObject) {
-                setMap((prev) => {
-                    const newMap = [...prev];
-                    newMap[y][x] = {...newMap[y][x], object: selectedObject};
-                    return newMap;
-                });
-            }
-        } else if (e.button === 2) {
-            // Правая кнопка: сброс
-            e.preventDefault(); // Отключаем контекстное меню
-            if (type === 'vWall' && x < 31) {
-                setWalls((prev) => {
-                    const newWalls = [...prev];
-                    newWalls[0][y][x] = {texture: null, mirror: false};
-                    return newWalls;
-                });
-            } else if (type === 'hWall') {
-                setWalls((prev) => {
-                    const newWalls = [...prev];
-                    newWalls[1][y][x] = {texture: null, mirror: false};
-                    return newWalls;
-                });
-            } else if (type === 'cell') {
-                setMap((prev) => {
-                    const newMap = [...prev];
-                    newMap[y][x] = {...newMap[y][x], object: null};
-                    return newMap;
-                });
-            }
+    const updateWall = (
+        walls: WallState[][][],
+        x: number,
+        y: number,
+        type: WallType,
+        texture: string | null,
+        toggleMirror: boolean = false,
+    ): WallState[][][] => {
+        const newWalls = [...walls];
+        const index = type === 'vWall' ? 0 : 1;
+        const current = newWalls[index][y][x];
+        console.trace(toggleMirror)
+
+        newWalls[index][y][x] = {
+            texture,
+            mirror: toggleMirror ? !current.mirror : current.mirror,
+        };
+        return newWalls;
+    };
+
+    const handleMouseDownAction = (
+        e: React.MouseEvent<HTMLDivElement>,
+        x: number,
+        y: number,
+        type: ElementType,
+    ): void => {
+        const isLeftClick = e.button === 0;
+        const isRightClick = e.button === 2;
+        if (!isLeftClick && !isRightClick) return;
+
+        if (isRightClick) e.preventDefault();
+
+        if (type === 'cell') {
+            setMap((prev) => {
+                const newMap = [...prev];
+                newMap[y][x] = {
+                    ...newMap[y][x],
+                    object: isLeftClick ? selectedObject : null,
+                };
+                return newMap;
+            });
+            return;
+        }
+
+        if ((type === 'vWall' && x >= 31) || (!selectedTexture && isLeftClick)) return;
+
+        const toggle =
+            isLeftClick &&
+            ((type === 'vWall' && selectedTexture === walls[0][y][x].texture) ||
+                (type === 'hWall' && selectedTexture === walls[1][y][x].texture));
+        const newWalls = updateWall(walls, x, y, type, isLeftClick ? selectedTexture : null, toggle);
+        setWalls(newWalls);
+    };
+
+    const handleMouseEnterAction = (x: number, y: number, type: ElementType): void => {
+        if (!isMouseDown.current) return;
+
+        if (type === 'cell' && selectedObject) {
+            setMap((prev) => {
+                const newMap = [...prev];
+                newMap[y][x] = {
+                    ...newMap[y][x],
+                    object: selectedObject,
+                };
+                return newMap;
+            });
+        } else if (type !== 'cell' && selectedTexture && !(type === 'vWall' && x >= 31)) {
+            const newWalls = updateWall(walls, x, y, type, selectedTexture, false);
+            setWalls(newWalls);
         }
     };
 
-    const handleMouseEnterAction = (x: number, y: number, type: 'cell' | 'vWall' | 'hWall') => {
-        if (isMouseDown.current) {
-            if (type === 'vWall' && selectedTexture && x < 31) {
-                setWalls((prev) => {
-                    const newWalls = [...prev];
-                    newWalls[0][y][x] = {texture: selectedTexture, mirror: newWalls[0][y][x].mirror};
-                    return newWalls;
-                });
-            } else if (type === 'hWall' && selectedTexture) {
-                setWalls((prev) => {
-                    const newWalls = [...prev];
-                    newWalls[1][y][x] = {texture: selectedTexture, mirror: newWalls[1][y][x].mirror};
-                    return newWalls;
-                });
-            } else if (type === 'cell' && selectedObject) {
-                setMap((prev) => {
-                    const newMap = [...prev];
-                    newMap[y][x] = {...newMap[y][x], object: selectedObject};
-                    return newMap;
-                });
-            }
-        }
-    };
-
-    const handleMouseDown = (x: number, y: number, type: 'cell' | 'vWall' | 'hWall') => {
-        return (e: React.MouseEvent<HTMLDivElement>) => {
+    const handleMouseDown = (
+        x: number,
+        y: number,
+        type: ElementType,
+    ): ((e: React.MouseEvent<HTMLDivElement>) => void) => {
+        return (e: React.MouseEvent<HTMLDivElement>): void => {
             if (e.button === 0 || e.button === 2) {
                 isMouseDown.current = e.button === 0;
                 handleMouseDownAction(e, x, y, type);
@@ -121,18 +122,19 @@ const MapEditor: React.FC<MapEditorProps> = ({
         };
     };
 
-    const handleMouseEnter = (x: number, y: number, type: 'cell' | 'vWall' | 'hWall') => {
-        return () => {
-            if (isMouseDown.current) {
-                handleMouseEnterAction(x, y, type);
-            }
+    const handleMouseEnter = (
+        x: number,
+        y: number,
+        type: ElementType,
+    ): (() => void) => {
+        return (): void => {
+            handleMouseEnterAction(x, y, type);
         };
     };
 
-    const handleMouseUp = () => {
+    const handleMouseUp = (): void => {
         isMouseDown.current = false;
     };
-
     const saveMap = useCallback(() => {
         const data = {map, walls};
         const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
