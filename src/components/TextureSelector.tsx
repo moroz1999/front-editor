@@ -1,13 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './TextureSelector.css';
 
-const textures = ['empty.bmp', ...Array(24).fill(null).map((_, i) => `${String(i + 1).padStart(2, '0')}.bmp`)];
+const textures = [
+    'empty.bmp',
+    ...Array(24)
+        .fill(null)
+        .map((_, i) => `${String(i).padStart(2, '0')}.bmp`),
+];
 
-const TextureSelector: React.FC<{ onSelect: (texture: string | null) => void }> = ({ onSelect }) => {
-    const [selected, setSelected] = useState<string | null>(null);
+interface TextureSelectorProps {
+    onSelect: (texture: string | null) => void;
+    selected: string | null;
+}
 
+const TextureSelector: React.FC<TextureSelectorProps> = ({onSelect, selected}) => {
     const handleSelect = (texture: string) => {
-        setSelected(texture);
         onSelect(texture === 'empty.bmp' ? null : texture);
     };
 

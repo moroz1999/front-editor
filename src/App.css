@@ -1,10 +1,11 @@
 
 :root {
-    --wall-thickness: 24px;
+    --wall-thickness: 30px;
     --h-wall-gap: var(--wall-thickness);
-    --cell-size: 64px;
+    --cell-size: 80px;
     --h-wall-width: var(--cell-size);
     --cell-border: 1px solid #808080;
+    --cell-border-hover: 2px solid #000080;
 }
 body {
     margin: 0;

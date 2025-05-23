@@ -1,6 +1,6 @@
 .v-wall {
     width: var(--wall-thickness);
-    border: var(--cell-border);
+    outline: var(--cell-border);
     background-size: 100% 100%;
     box-sizing: border-box;
     transform: skewY(-45deg);
@@ -9,6 +9,10 @@
     z-index: 2;
     top: calc(var(--wall-thickness) / 2);
 
+}
+
+.v-wall:hover {
+    outline: var(--cell-border-hover);
 }
 
 .v-mirrored {

@@ -14,3 +14,7 @@
     top: var(--wall-thickness);
     background-size: cover;
 }
+
+.object:hover {
+    outline: var(--cell-border-hover);
+}
