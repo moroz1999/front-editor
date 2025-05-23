@@ -48,7 +48,6 @@ const MapEditor: React.FC<MapEditorProps> = ({
         const newWalls = [...walls];
         const index = type === 'vWall' ? 0 : 1;
         const current = newWalls[index][y][x];
-        console.trace(toggleMirror)
 
         newWalls[index][y][x] = {
             texture,
