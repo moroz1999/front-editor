@@ -1,14 +1,23 @@
 .v-wall {
     width: var(--wall-thickness);
     outline: var(--cell-border);
-    background-size: 100% 100%;
     box-sizing: border-box;
     transform: skewY(-45deg);
     margin-left: calc(0px - var(--wall-thickness));
     position: relative;
     z-index: 2;
     top: calc(var(--wall-thickness) / 2);
+    width: var(--wall-thickness);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
 
+.v-wall-img {
+    height: var(--wall-thickness);
+    width: var(--cell-size);
+    transform: rotate(90deg);
 }
 
 .v-wall:hover {

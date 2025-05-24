@@ -8,15 +8,13 @@ interface WallProps {
     onMouseEnter: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
-const VWall: React.FC<WallProps> = ({ texture, mirror, onMouseDown, onMouseEnter }) => {
+const VWall: React.FC<WallProps> = ({texture, mirror, onMouseDown, onMouseEnter}) => {
     const className = `v-wall ${mirror ? 'v-mirrored' : ''}`;
     return <div
         className={className}
-        style={{
-            backgroundImage: texture ? `url(/textures/${texture})` : undefined,
-        }}
         onMouseDown={onMouseDown}
         onMouseEnter={onMouseEnter}
-    />
-}
+    >{texture && <img className='v-wall-img' src={`/textures/${texture}`}/>}
+    </div>;
+};
 export default VWall;
