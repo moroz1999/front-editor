@@ -14,7 +14,12 @@ const VWall: React.FC<WallProps> = ({texture, mirror, onMouseDown, onMouseEnter}
         className={className}
         onMouseDown={onMouseDown}
         onMouseEnter={onMouseEnter}
-    >{texture && <img className='v-wall-img' src={`/textures/${texture}`}/>}
+    >{texture &&   <div
+        className="v-wall-img"
+        style={{
+            backgroundImage: `url(/textures/${texture})`,
+        }}
+    />}
     </div>;
 };
 export default VWall;

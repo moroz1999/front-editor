@@ -89,6 +89,31 @@ const MapEditor: React.FC<MapEditorProps> = ({
         const newWalls = updateWall(walls, x, y, type, isLeftClick ? selectedTexture : null, toggle);
         setWalls(newWalls);
     };
+    const [isInitialized, setInitialized] = useState(false);
+
+    useEffect(() => {
+        const value = localStorage.getItem('walls');
+        if (value !== null) {
+            setWalls(JSON.parse(value));
+        }
+        const mapValue = localStorage.getItem('map');
+        if (mapValue !== null) {
+            setMap(JSON.parse(mapValue));
+        }
+        setInitialized(true);
+    }, []);
+
+    useEffect(() => {
+        if (isInitialized) {
+            localStorage.setItem('walls', JSON.stringify(walls));
+        }
+    }, [walls, isInitialized]);
+
+    useEffect(() => {
+        if (isInitialized) {
+            localStorage.setItem('map', JSON.stringify(map));
+        }
+    }, [map, isInitialized]);
 
     const handleMouseEnterAction = (x: number, y: number, type: ElementType): void => {
         if (!isMouseDown.current) return;
