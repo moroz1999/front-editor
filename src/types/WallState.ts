@@ -1,4 +1,4 @@
 export interface WallState {
-    texture: string | null;
+    texture: number | null;
     mirror: boolean;
 }

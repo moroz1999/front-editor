@@ -1,7 +1,7 @@
 import {useCallback} from 'react';
-import type {WallState} from '../components/WallState.ts';
-import type {CellData} from '../components/CellData.ts';
-import type {Map} from '../components/Map.ts';
+import type {WallState} from '../types/WallState.ts';
+import type {CellData} from '../types/CellData.ts';
+import type {Map} from '../types/Map.ts';
 
 const EMPTY_WALL: WallState = {texture: null, mirror: false};
 const MAP_SIZE = 32;
@@ -32,22 +32,24 @@ const decodeWallByte = (byte: number): WallState => {
         return EMPTY_WALL;
     }
 
-    return {texture: textureId.toString(), mirror};
+    return {texture: textureId, mirror};
 };
 
 const parseWallRow = (
     view: DataView,
     offset: number,
     limit: number,
-): WallState[] => {
+): [WallState[], number] => {
     const row: WallState[] = [];
-
+    let offsetShift = 0;
     while (offset < view.byteLength && row.length < limit) {
+        offsetShift++;
         const byte = view.getUint8(offset++);
         if (byte === BYTE_END_ROW) break;
 
         if (byte === BYTE_RLE && offset < view.byteLength) {
             const repeatCount = view.getUint8(offset++);
+            offsetShift++;
             for (let i = 0; i < repeatCount && row.length < limit; i++) {
                 row.push(EMPTY_WALL);
             }
@@ -56,14 +58,14 @@ const parseWallRow = (
         }
     }
 
-    return row;
+    return [row, offsetShift];
 };
 
 const parseMapFile = async (file: File): Promise<Map> => {
     const buffer = await file.arrayBuffer();
     const view = new DataView(buffer);
 
-    const objects: CellData[][] = Array(MAP_SIZE)
+    const cells: CellData[][] = Array(MAP_SIZE)
         .fill(null)
         .map(() => Array(MAP_SIZE).fill({object: null}));
     const hWalls: WallState[][] = [];
@@ -82,26 +84,25 @@ const parseMapFile = async (file: File): Promise<Map> => {
         offset += 8;
 
         if (x < MAP_SIZE && y < MAP_SIZE) {
-            objects[y][x] = {object: {x, y, type}};
+            cells[y][x] = {object: type};
         }
     }
 
     offset += 2;
 
     for (let y = 0; y < MAP_SIZE; y++) {
-        const hRow = parseWallRow(view, offset, MAP_SIZE);
-        offset += hRow.length + 1;
+        const [hRow, hShift] = parseWallRow(view, offset, MAP_SIZE);
+        offset += hShift;
         while (hRow.length < MAP_SIZE) hRow.push(EMPTY_WALL);
         hWalls.push(hRow);
 
-        const vRow = parseWallRow(view, offset, MAP_SIZE - 1);
-        offset += vRow.length + 1;
-        while (vRow.length < MAP_SIZE - 1) vRow.push(EMPTY_WALL);
+        const [vRow, vShift] = parseWallRow(view, offset, MAP_SIZE - 1);
+        offset += vShift;
+        while (vRow.length < MAP_SIZE) vRow.push(EMPTY_WALL);
         vWalls.push(vRow);
     }
 
-    console.log(hWalls, vWalls, objects);
-    return {hWalls, vWalls, objects};
+    return {hWalls, vWalls, cells};
 };
 
 const useMapLoader = () => {

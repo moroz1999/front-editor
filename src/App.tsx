@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import MapEditor from './components/MapEditor';
-import type {Map} from './components/Map';
+import type {Map} from './types/Map.ts';
 import TextureSelector from './components/TextureSelector';
 import ObjectSelector from './components/ObjectSelector';
 import './App.css';
@@ -10,12 +10,12 @@ const emptyWall = {texture: null, mirror: false};
 const emptyMap: Map = {
     hWalls: Array(32).fill(null).map(() => Array(32).fill(emptyWall)),
     vWalls: Array(32).fill(null).map(() => Array(31).fill(emptyWall)),
-    objects: Array(32).fill(null).map(() => Array(32).fill({object: null})),
+    cells: Array(32).fill(null).map(() => Array(32).fill({object: null})),
 };
 
 const App: React.FC = () => {
-    const [selectedTexture, setSelectedTexture] = useState<string | null>(null);
-    const [selectedObject, setSelectedObject] = useState<string | null>(null);
+    const [selectedTexture, setSelectedTexture] = useState<number | null>(null);
+    const [selectedObject, setSelectedObject] = useState<number | null>(null);
     const [map, setMap] = useState<Map>(() => {
         const raw = localStorage.getItem('map');
         return raw ? JSON.parse(raw) : emptyMap;
@@ -46,8 +46,8 @@ const App: React.FC = () => {
                 <MapEditor
                     map={map}
                     onChange={setMap}
-                    selectedTexture={selectedTexture}
-                    selectedObject={selectedObject}
+                    selectedTextureNumber={selectedTexture}
+                    selectedObjectNumber={selectedObject}
                 />
             </div>
             <div className="sidebar">

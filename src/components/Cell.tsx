@@ -1,27 +1,29 @@
 import React from 'react';
 import './Cell.css';
+import {getObjectByNumber} from './mapObjects.ts';
 
 interface CellProps {
-    object: string | null;
+    object: number | null;
     onMouseDown: (e: React.MouseEvent<HTMLDivElement>) => void;
     onMouseEnter: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
-const Cell: React.FC<CellProps> = ({ object, onMouseDown, onMouseEnter }) => (
-    <div
+const Cell: React.FC<CellProps> = ({object, onMouseDown, onMouseEnter}) => {
+    const selectedObject = getObjectByNumber(object);
+    return <div
         className="cell"
         onMouseDown={onMouseDown}
         onMouseEnter={onMouseEnter}
     >
-        {object && (
+        {selectedObject && (
             <div
                 className="object"
                 style={{
-                    backgroundImage: `url(/objects/${object})`,
+                    backgroundImage: `url(/objects/${selectedObject?.image})`,
                 }}
             />
         )}
-    </div>
-);
+    </div>;
+};
 
 export default Cell;

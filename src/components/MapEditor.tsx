@@ -3,19 +3,19 @@ import Cell from './Cell';
 import HWall from './HWall';
 import VWall from './VWall';
 import './MapEditor.css';
-import type {Map} from './Map';
+import type {Map} from '../types/Map.ts';
 
 interface MapEditorProps {
     map: Map;
     onChange: (map: Map) => void;
-    selectedTexture: string | null;
-    selectedObject: string | null;
+    selectedTextureNumber: number | null;
+    selectedObjectNumber: number | null;
 }
 
 type WallType = 'vWall' | 'hWall'
 type ElementType = 'cell' | WallType
 
-const MapEditor: React.FC<MapEditorProps> = ({map, onChange, selectedTexture, selectedObject}) => {
+const MapEditor: React.FC<MapEditorProps> = ({map, onChange, selectedTextureNumber, selectedObjectNumber}) => {
     const isMouseDown = useRef(false);
 
     const updateWall = (
@@ -23,13 +23,13 @@ const MapEditor: React.FC<MapEditorProps> = ({map, onChange, selectedTexture, se
         x: number,
         y: number,
         type: WallType,
-        texture: string | null,
+        texture: number | null,
         toggleMirror = false,
     ): Map => {
         const next: Map = {
             hWalls: m.hWalls.map(r => r.slice()),
             vWalls: m.vWalls.map(r => r.slice()),
-            objects: m.objects.map(r => r.slice()),
+            cells: m.cells.map(r => r.slice()),
         };
         if (type === 'vWall') {
             const current = next.vWalls[y][x];
@@ -56,38 +56,38 @@ const MapEditor: React.FC<MapEditorProps> = ({map, onChange, selectedTexture, se
         if (type === 'cell') {
             onChange({
                 ...map,
-                objects: map.objects.map((row, yi) =>
+                cells: map.cells.map((row, yi) =>
                     row.map((cell, xi) => (xi === x && yi === y ? {
                         ...cell,
-                        object: isLeftClick ? selectedObject : null,
+                        object: isLeftClick ? selectedObjectNumber : null,
                     } : cell)),
                 ),
             });
             return;
         }
 
-        if ((type === 'vWall' && x >= 31) || (!selectedTexture && isLeftClick)) return;
+        if ((type === 'vWall' && x >= 31) || (!selectedTextureNumber && isLeftClick)) return;
 
         const toggle =
             isLeftClick &&
-            ((type === 'vWall' && selectedTexture === map.vWalls[y][x].texture) ||
-                (type === 'hWall' && selectedTexture === map.hWalls[y][x].texture));
-        const newMap = updateWall(map, x, y, type as WallType, isLeftClick ? selectedTexture : null, toggle);
+            ((type === 'vWall' && selectedTextureNumber === map.vWalls[y][x].texture) ||
+                (type === 'hWall' && selectedTextureNumber === map.hWalls[y][x].texture));
+        const newMap = updateWall(map, x, y, type as WallType, isLeftClick ? selectedTextureNumber : null, toggle);
         onChange(newMap);
     };
 
     const handleMouseEnterAction = (x: number, y: number, type: ElementType): void => {
         if (!isMouseDown.current) return;
 
-        if (type === 'cell' && selectedObject) {
+        if (type === 'cell' && selectedObjectNumber) {
             onChange({
                 ...map,
-                objects: map.objects.map((row, yi) =>
-                    row.map((cell, xi) => (xi === x && yi === y ? {...cell, object: selectedObject} : cell)),
+                cells: map.cells.map((row, yi) =>
+                    row.map((cell, xi) => (xi === x && yi === y ? {...cell, object: selectedObjectNumber} : cell)),
                 ),
             });
-        } else if (type !== 'cell' && selectedTexture && !(type === 'vWall' && x >= 31)) {
-            const newMap = updateWall(map, x, y, type as WallType, selectedTexture, false);
+        } else if (type !== 'cell' && selectedTextureNumber && !(type === 'vWall' && x >= 31)) {
+            const newMap = updateWall(map, x, y, type as WallType, selectedTextureNumber, false);
             onChange(newMap);
         }
     };
@@ -132,11 +132,6 @@ const MapEditor: React.FC<MapEditorProps> = ({map, onChange, selectedTexture, se
                                     .fill(null)
                                     .map((_, x) => (
                                         <React.Fragment key={`cell-${x}-${y}`}>
-                                            <Cell
-                                                object={map.objects[y][x].object}
-                                                onMouseDown={handleMouseDown(x, y, 'cell')}
-                                                onMouseEnter={handleMouseEnter(x, y, 'cell')}
-                                            />
                                             {x < 31 && (
                                                 <VWall
                                                     texture={map.vWalls[y][x].texture}
@@ -145,6 +140,11 @@ const MapEditor: React.FC<MapEditorProps> = ({map, onChange, selectedTexture, se
                                                     onMouseEnter={handleMouseEnter(x, y, 'vWall')}
                                                 />
                                             )}
+                                            <Cell
+                                                object={map.cells[y][x].object ?? null}
+                                                onMouseDown={handleMouseDown(x, y, 'cell')}
+                                                onMouseEnter={handleMouseEnter(x, y, 'cell')}
+                                            />
                                         </React.Fragment>
                                     ))}
                             </div>
