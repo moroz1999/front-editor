@@ -1,4 +1,4 @@
 export interface MapTextureSelectorValue {
     number: number | null;
-    image: string;
+    image: string | null;
 }

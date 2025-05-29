@@ -13,8 +13,8 @@ const TextureSelector: React.FC<TextureSelectorProps> = ({onSelect, selected}) =
             {MAP_TEXTURES.map((texture) => (
                 <img
                     key={texture.image}
-                    src={`/textures/${texture.image}`}
-                    alt={texture.image}
+                    src={`${texture.image}`}
+                    alt={texture.image ?? ''}
                     className={selected === texture.number ? 'selected' : ''}
                     onClick={() => onSelect(texture.number)}
                 />

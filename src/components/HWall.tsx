@@ -10,12 +10,14 @@ interface WallProps {
 }
 
 const HWall: React.FC<WallProps> = ({texture, mirror, onMouseDown, onMouseEnter}) => {
-    const className = `h-wall ${mirror ? 'h-mirrored' : ''}`;
     const selectedTexture = getTextureByNumber(texture);
+
+    const hasImage = selectedTexture?.image;
+    const className = `h-wall ${mirror ? ' h-mirrored' : ''} ${hasImage ? ' h-has-image' : ''}`;
     return <div
         className={className}
         style={{
-            backgroundImage: texture ? `url(/textures/${selectedTexture?.image})` : undefined,
+            backgroundImage: hasImage ? `url(${selectedTexture?.image})` : undefined,
         }}
         onMouseDown={onMouseDown}
         onMouseEnter={onMouseEnter}

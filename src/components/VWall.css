@@ -13,6 +13,10 @@
     flex-direction: column;
 }
 
+.v-has-image {
+    outline: none;
+}
+
 .v-wall-img {
     height: var(--wall-thickness);
     width: var(--cell-size);

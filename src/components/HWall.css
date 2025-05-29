@@ -11,6 +11,10 @@
     left: calc(var(--wall-thickness) / -2);
 }
 
+.h-has-image {
+    outline: none;
+}
+
 .h-wall:hover {
     outline: var(--cell-border-hover);
 }

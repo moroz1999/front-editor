@@ -4,7 +4,7 @@
     --h-wall-gap: var(--wall-thickness);
     --cell-size: 80px;
     --h-wall-width: var(--cell-size);
-    --cell-border: 1px solid #808080;
+    --cell-border: 1px solid #d0d0d0;
     --cell-border-hover: 2px solid #000080;
 }
 
@@ -18,6 +18,7 @@ body {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+    image-rendering: optimizequality;
 }
 
 .editor {

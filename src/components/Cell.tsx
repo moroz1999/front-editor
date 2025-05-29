@@ -19,7 +19,7 @@ const Cell: React.FC<CellProps> = ({object, onMouseDown, onMouseEnter}) => {
             <div
                 className="object"
                 style={{
-                    backgroundImage: `url(/objects/${selectedObject?.image})`,
+                    backgroundImage: `url(${selectedObject?.image})`,
                 }}
             />
         )}

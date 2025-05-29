@@ -6,12 +6,17 @@
     margin-top: 20px;
 }
 
-.object-selector img {
-    width: 100%;
-    height: auto;
+.object-selector-item {
     cursor: pointer;
+    aspect-ratio: 1;
 }
 
-.object-selector img.selected {
-    border: 2px solid red;
+.object-image {
+    width: 100%;
+    height: 100%;
+    background-size: 100% 100%;
+}
+
+.object-selector .object-selector-item.selected {
+    outline: 2px solid red;
 }

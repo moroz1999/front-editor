@@ -10,8 +10,10 @@ interface WallProps {
 }
 
 const VWall: React.FC<WallProps> = ({texture, mirror, onMouseDown, onMouseEnter}) => {
-    const className = `v-wall ${mirror ? 'v-mirrored' : ''}`;
     const selectedTexture = getTextureByNumber(texture);
+
+    const hasImage = selectedTexture?.image;
+    const className = `v-wall ${mirror ? ' v-mirrored' : ''} ${hasImage ? ' v-has-image' : ''}`;
     return <div
         className={className}
         onMouseDown={onMouseDown}
@@ -19,7 +21,7 @@ const VWall: React.FC<WallProps> = ({texture, mirror, onMouseDown, onMouseEnter}
     >{texture && <div
         className="v-wall-img"
         style={{
-            backgroundImage: `url(/textures/${selectedTexture?.image})`,
+            backgroundImage: hasImage ? `url(${selectedTexture?.image})` : undefined,
         }}
     />}
     </div>;
