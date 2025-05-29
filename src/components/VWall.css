@@ -2,7 +2,7 @@
     width: var(--wall-thickness);
     outline: var(--cell-border);
     box-sizing: border-box;
-    transform: skewY(-45deg);
+    transform: skewY(-45deg) scaleY(-1);
     margin-left: calc(0px - var(--wall-thickness));
     position: relative;
     z-index: 2;
@@ -29,5 +29,5 @@
 }
 
 .v-mirrored {
-    transform: skewY(-45deg) scaleY(-1);
+    transform: skewY(-45deg);
 }

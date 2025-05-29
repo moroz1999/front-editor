@@ -13,7 +13,6 @@ const HEADER_SIZE = 41;
 const OBJECT_END_1 = 0xff;
 const OBJECT_END_2 = 0xff;
 const OFFSET_Y_BASE = 0xA0;
-const OBJECT_TYPE_DIVISOR = 3;
 const ENCODING_STANDARD_MIN = 0x31;
 const ENCODING_BIGL_MIN = 0x60;
 const ENCODING_BIGL_OFFSET = 0x40;
@@ -61,6 +60,12 @@ const parseWallRow = (
     return [row, offsetShift];
 };
 
+const parseHeader = (view: DataView): {exitX: number, exitY: number} => {
+    const exitX = view.getUint8(33);
+    const exitY = view.getUint8(34) - OFFSET_Y_BASE;
+    return {exitX, exitY};
+};
+
 const parseMapFile = async (file: File): Promise<Map> => {
     const buffer = await file.arrayBuffer();
     const view = new DataView(buffer);
@@ -71,6 +76,8 @@ const parseMapFile = async (file: File): Promise<Map> => {
     const hWalls: WallState[][] = [];
     const vWalls: WallState[][] = [];
 
+    const {exitX, exitY} = parseHeader(view);
+
     let offset = HEADER_SIZE;
 
     while (
@@ -79,7 +86,7 @@ const parseMapFile = async (file: File): Promise<Map> => {
         ) {
         const x = view.getUint8(offset + 1);
         const y = view.getUint8(offset + 3) - OFFSET_Y_BASE;
-        const type = view.getUint8(offset + 4) / OBJECT_TYPE_DIVISOR;
+        const type = view.getUint8(offset + 4);
 
         offset += 8;
 
@@ -89,6 +96,10 @@ const parseMapFile = async (file: File): Promise<Map> => {
     }
 
     offset += 2;
+
+    if (exitX < MAP_SIZE && exitY < MAP_SIZE) {
+        cells[exitY][exitX] = {object: 29};
+    }
 
     for (let y = 0; y < MAP_SIZE; y++) {
         const [hRow, hShift] = parseWallRow(view, offset, MAP_SIZE);

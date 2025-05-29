@@ -11,9 +11,10 @@ export const MAP_OBJECTS: MapObjectSelectorValue[] = [
     {number: 7, image: '/objects/ammo.png'},
     {number: 8, image: '/objects/medkit.png'},
     {number: 9, image: '/textures/column.png'},
-    {number: 27, image: '/textures/teleport1.png'},
-    {number: 28, image: '/textures/teleport2.png'},
-    {number: 29, image: '/textures/exit.png'},
+    {number: 27, image: '/objects/teleport1-1.png'},
+    {number: 28, image: '/objects/teleport1-2.png'},
+    {number: 29, image: '/objects/exit.png'},
+    {number: 31, image: '/objects/start.png'},
 ];
 
 export const getObjectByNumber = (n: number | null): MapObjectSelectorValue | undefined => {

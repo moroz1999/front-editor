@@ -5,12 +5,18 @@
     width: 100%;
 }
 
-.texture-selector img {
+.texture-selector-item {
     width: 100%;
-    height: auto;
     cursor: pointer;
+    aspect-ratio: 1;
 }
 
-.texture-selector img.selected {
+.texture-selector-item.selected {
     outline: 2px solid red;
+}
+
+.texture-image {
+    width: 100%;
+    height: 100%;
+    background-size: 100%;
 }

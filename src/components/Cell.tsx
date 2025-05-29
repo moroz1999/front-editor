@@ -9,7 +9,7 @@ interface CellProps {
 }
 
 const Cell: React.FC<CellProps> = ({object, onMouseDown, onMouseEnter}) => {
-    const selectedObject = getObjectByNumber(object);
+    const selectedObject = object !== null ? getObjectByNumber(object) : undefined;
     return <div
         className="cell"
         onMouseDown={onMouseDown}
