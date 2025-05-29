@@ -60,10 +60,16 @@ const parseWallRow = (
     return [row, offsetShift];
 };
 
-const parseHeader = (view: DataView): {exitX: number, exitY: number} => {
+const parseExit = (view: DataView): {exitX: number, exitY: number} => {
     const exitX = view.getUint8(33);
     const exitY = view.getUint8(34) - OFFSET_Y_BASE;
     return {exitX, exitY};
+};
+
+const parseStart = (view: DataView): {startX: number, startY: number} => {
+    const startX = view.getUint8(37);
+    const startY = view.getUint8(38) - OFFSET_Y_BASE;
+    return {startX, startY};
 };
 
 const parseMapFile = async (file: File): Promise<Map> => {
@@ -76,7 +82,8 @@ const parseMapFile = async (file: File): Promise<Map> => {
     const hWalls: WallState[][] = [];
     const vWalls: WallState[][] = [];
 
-    const {exitX, exitY} = parseHeader(view);
+    const {exitX, exitY} = parseExit(view);
+    const {startX, startY} = parseStart(view);
 
     let offset = HEADER_SIZE;
 
@@ -99,6 +106,10 @@ const parseMapFile = async (file: File): Promise<Map> => {
 
     if (exitX < MAP_SIZE && exitY < MAP_SIZE) {
         cells[exitY][exitX] = {object: 29};
+    }
+
+    if (startX < MAP_SIZE && startY < MAP_SIZE) {
+        cells[startY][startX] = {object: 31};
     }
 
     for (let y = 0; y < MAP_SIZE; y++) {
