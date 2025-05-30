@@ -5,6 +5,7 @@ import TextureSelector from './components/TextureSelector';
 import ObjectSelector from './components/ObjectSelector';
 import './App.css';
 import useMapLoader from './hooks/useMapLoader';
+import {serializeMapToBinary} from './hooks/serializeMapToBinary.ts';
 
 const emptyWall = {texture: null, mirror: false};
 const emptyMap: Map = {
@@ -26,15 +27,18 @@ const App: React.FC = () => {
         localStorage.setItem('map', JSON.stringify(map));
     }, [map]);
 
+
     const saveMap = useCallback(() => {
-        const blob = new Blob([JSON.stringify(map)], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'map.json';
-        a.click();
-        URL.revokeObjectURL(url);
+        const binary = serializeMapToBinary(map);
+        const binBlob = new Blob([binary], {type: 'application/octet-stream'});
+        const binUrl = URL.createObjectURL(binBlob);
+        const binLink = document.createElement('a');
+        binLink.href = binUrl;
+        binLink.download = 'map.bin';
+        binLink.click();
+        URL.revokeObjectURL(binUrl);
     }, [map]);
+
 
     const handleLoad = (file: File) => {
         loadFromFile(file).then(setMap);
