@@ -10,7 +10,12 @@ interface EditorStoreState {
     setSelectedTextureNumber: (n: number | null) => void,
     selectedObjectNumber: number | null,
     setSelectedObjectNumber: (n: number | null) => void,
+    zoom: number,
+    setZoom: (zoom: number) => void,
+    incZoom: () => void,
+    decZoom: () => void,
 }
+
 const emptyMap = makeEmptyMap();
 export const useEditorStore = create<EditorStoreState>()(
     persist(
@@ -24,6 +29,10 @@ export const useEditorStore = create<EditorStoreState>()(
                 selectedObjectNumber: object,
                 selectedTextureNumber: null,
             }),
+            zoom: 1,
+            setZoom: (zoom: number) => set({zoom}),
+            incZoom: () => set(state => ({zoom: state.zoom + 0.25})),
+            decZoom: () => set(state => ({zoom: state.zoom - 0.25})),
         }),
         {
             name: 'map-editor',

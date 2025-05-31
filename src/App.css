@@ -35,6 +35,9 @@ body {
     padding: 10px;
     box-sizing: border-box;
     overflow-y: auto;
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
 }
 
 .controls {
