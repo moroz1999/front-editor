@@ -1,14 +1,11 @@
 import type {Map} from '../types/Map.ts';
 import type {WallState} from '../types/WallState.ts';
-import type {CellData} from '../types/CellData.ts';
 
-const EMPTY_WALL: WallState = {texture: null, mirror: false};
 const MAP_SIZE = 32;
 const BYTE_EMPTY = 0x20;
 const BYTE_EMPTY_MIRRORED = 0xC1;
 const BYTE_END_ROW = 0x0d;
 const BYTE_RLE = 0x01;
-const HEADER_SIZE = 41;
 const OBJECT_END_1 = 0xff;
 const OBJECT_END_2 = 0xff;
 const OFFSET_Y_BASE = 0xA0;
@@ -31,7 +28,7 @@ const encodeWallByte = (wall: WallState): number => {
     return byte;
 };
 
-const encodeWallRow = (row: WallState[], isVertical: boolean): number[] => {
+const encodeWallRow = (row: WallState[]): number[] => {
     let lastIndex = row.length - 1;
     while (
         lastIndex >= 0 &&
@@ -137,10 +134,10 @@ export const serializeMapToBinary = (map: Map): Uint8Array => {
 
     // Стены
     for (let y = 0; y < MAP_SIZE; y++) {
-        const hRow = encodeWallRow(map.hWalls[y], false);
+        const hRow = encodeWallRow(map.hWalls[y]);
         buffer.push(...hRow);
 
-        const vRow = encodeWallRow(map.vWalls[y], true);
+        const vRow = encodeWallRow(map.vWalls[y]);
         buffer.push(...vRow);
     }
 
