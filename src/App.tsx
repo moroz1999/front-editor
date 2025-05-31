@@ -1,28 +1,16 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useEffect, useCallback} from 'react';
 import MapEditor from './components/MapEditor';
-import type {Map} from './types/Map.ts';
 import TextureSelector from './components/TextureSelector';
 import ObjectSelector from './components/ObjectSelector';
 import './App.css';
 import useMapLoader from './hooks/useMapLoader';
 import {serializeMapToBinary} from './hooks/serializeMapToBinary.ts';
-
-const emptyWall = {texture: null, mirror: false};
-const makeEmptyMap = (): Map => {
-    return {
-        hWalls: Array(32).fill(null).map(() => Array(32).fill(emptyWall)),
-        vWalls: Array(32).fill(null).map(() => Array(31).fill(emptyWall)),
-        cells: Array(32).fill(null).map(() => Array(32).fill({object: null})),
-    };
-};
+import {makeEmptyMap} from './utils/makeEmptyMap.ts';
+import {useEditorStore} from './store/EditorStore.ts';
 
 const App: React.FC = () => {
-    const [selectedTexture, setSelectedTexture] = useState<number | null>(null);
-    const [selectedObject, setSelectedObject] = useState<number | null>(null);
-    const [map, setMap] = useState<Map>(() => {
-        const raw = localStorage.getItem('map');
-        return raw ? JSON.parse(raw) : makeEmptyMap();
-    });
+    const map    = useEditorStore(state => state.map)
+    const setMap = useEditorStore(state => state.setMap)
     const {loadFromFile} = useMapLoader();
 
     useEffect(() => {
@@ -55,28 +43,11 @@ const App: React.FC = () => {
     return (
         <div className="app">
             <div className="editor">
-                <MapEditor
-                    map={map}
-                    onChange={setMap}
-                    selectedTextureNumber={selectedTexture}
-                    selectedObjectNumber={selectedObject}
-                />
+                <MapEditor />
             </div>
             <div className="sidebar">
-                <TextureSelector
-                    onSelect={texture => {
-                        setSelectedTexture(texture);
-                        setSelectedObject(null);
-                    }}
-                    selected={selectedTexture}
-                />
-                <ObjectSelector
-                    onSelect={object => {
-                        setSelectedObject(object);
-                        setSelectedTexture(null);
-                    }}
-                    selected={selectedObject}
-                />
+                <TextureSelector/>
+                <ObjectSelector />
                 <div className="controls">
                     <button onClick={newMap}>New</button>
                     <button onClick={() => document.getElementById('file-input')?.click()}>Load</button>

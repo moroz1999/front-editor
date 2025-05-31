@@ -2,8 +2,9 @@ import {useCallback} from 'react';
 import type {WallState} from '../types/WallState.ts';
 import type {CellData} from '../types/CellData.ts';
 import type {Map} from '../types/Map.ts';
+import {emptyWall} from '../utils/makeEmptyMap.ts';
 
-const EMPTY_WALL: WallState = {texture: null, mirror: false};
+const EMPTY_WALL: WallState = emptyWall;
 const MAP_SIZE = 32;
 const BYTE_EMPTY = 0x20;
 const BYTE_EMPTY_MIRRORED = 0xC1;

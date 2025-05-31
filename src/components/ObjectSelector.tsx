@@ -1,13 +1,12 @@
 import React from 'react';
 import './ObjectSelector.css';
 import {MAP_OBJECTS} from './mapObjects.ts';
+import {useEditorStore} from '../store/EditorStore.ts';
 
-interface ObjectSelectorProps {
-    onSelect: (object: number | null) => void;
-    selected: number | null;
-}
 
-const ObjectSelector: React.FC<ObjectSelectorProps> = ({onSelect, selected}) => {
+const ObjectSelector: React.FC = () => {
+    const selectedObjectNumber = useEditorStore((state) => state.selectedObjectNumber);
+    const setSelectedObjectNumber = useEditorStore((state) => state.setSelectedObjectNumber);
     return (
         <div
             className="object-selector"
@@ -15,8 +14,8 @@ const ObjectSelector: React.FC<ObjectSelectorProps> = ({onSelect, selected}) => 
             {MAP_OBJECTS.map((object) => (
                 <div
                     key={object.image}
-                    className={'object-selector-item ' + (selected === object.number ? 'selected' : '')}
-                    onClick={() => onSelect(object.number)}
+                    className={'object-selector-item ' + (selectedObjectNumber === object.number ? 'selected' : '')}
+                    onClick={() => setSelectedObjectNumber(object.number)}
                 >
                     <div
                         className="object-image"

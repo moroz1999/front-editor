@@ -4,18 +4,16 @@ import HWall from './HWall';
 import VWall from './VWall';
 import './MapEditor.css';
 import type {Map} from '../types/Map.ts';
-
-interface MapEditorProps {
-    map: Map;
-    onChange: (map: Map) => void;
-    selectedTextureNumber: number | null;
-    selectedObjectNumber: number | null;
-}
+import {useEditorStore} from '../store/EditorStore.ts';
 
 type WallType = 'vWall' | 'hWall'
 type ElementType = 'cell' | WallType
 
-const MapEditor: React.FC<MapEditorProps> = ({map, onChange, selectedTextureNumber, selectedObjectNumber}) => {
+const MapEditor: React.FC = () => {
+    const map = useEditorStore(state => state.map);
+    const setMap = useEditorStore((state) => state.setMap);
+    const selectedTextureNumber = useEditorStore((state) => state.selectedTextureNumber);
+    const selectedObjectNumber = useEditorStore((state) => state.selectedObjectNumber);
     const isMouseDown = useRef(false);
 
     const updateWall = (
@@ -54,7 +52,7 @@ const MapEditor: React.FC<MapEditorProps> = ({map, onChange, selectedTextureNumb
         if (isRightClick) e.preventDefault();
 
         if (type === 'cell') {
-            onChange({
+            setMap({
                 ...map,
                 cells: map.cells.map((row, yi) =>
                     row.map((cell, xi) => (xi === x && yi === y ? {
@@ -73,14 +71,14 @@ const MapEditor: React.FC<MapEditorProps> = ({map, onChange, selectedTextureNumb
             ((type === 'vWall' && selectedTextureNumber === map.vWalls[y][x].texture) ||
                 (type === 'hWall' && selectedTextureNumber === map.hWalls[y][x].texture));
         const newMap = updateWall(map, x, y, type as WallType, isLeftClick ? selectedTextureNumber : null, toggle);
-        onChange(newMap);
+        setMap(newMap);
     };
 
     const handleMouseEnterAction = (x: number, y: number, type: ElementType): void => {
         if (!isMouseDown.current) return;
 
         if (type === 'cell' && selectedObjectNumber) {
-            onChange({
+            setMap({
                 ...map,
                 cells: map.cells.map((row, yi) =>
                     row.map((cell, xi) => (xi === x && yi === y ? {...cell, object: selectedObjectNumber} : cell)),
@@ -88,7 +86,7 @@ const MapEditor: React.FC<MapEditorProps> = ({map, onChange, selectedTextureNumb
             });
         } else if (type !== 'cell' && selectedTextureNumber && !(type === 'vWall' && x >= 31)) {
             const newMap = updateWall(map, x, y, type as WallType, selectedTextureNumber, false);
-            onChange(newMap);
+            setMap(newMap);
         }
     };
 
