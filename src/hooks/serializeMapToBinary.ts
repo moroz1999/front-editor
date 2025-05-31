@@ -17,7 +17,7 @@ const encodeWallByte = (wall: WallState): number => {
     if (!wall.texture && wall.mirror) return BYTE_EMPTY_MIRRORED;
 
     const t = wall.texture!;
-    let byte = 0;
+    let byte;
     if (t >= 16) {
         byte = (t << 1) + ENCODING_BIGL_OFFSET;
     } else {
@@ -28,51 +28,55 @@ const encodeWallByte = (wall: WallState): number => {
     return byte;
 };
 
-const encodeWallRow = (row: WallState[]): number[] => {
-    let lastIndex = row.length - 1;
+const isEmptyWall = (wall: WallState): boolean =>
+    wall.texture === null && !wall.mirror;
+
+const encodeEmptyWallSequence = (
+    row: WallState[],
+    startIndex: number,
+    lastValidIndex: number,
+): { bytes: number[], nextIndex: number } => {
+    const MAX_RUN_LENGTH = 255;
+    let runLength = 1;
+
     while (
-        lastIndex >= 0 &&
-        row[lastIndex].texture === null &&
-        row[lastIndex].mirror === false
+        startIndex + runLength <= lastValidIndex &&
+        isEmptyWall(row[startIndex + runLength]) &&
+        runLength < MAX_RUN_LENGTH
         ) {
-        lastIndex--;
+        runLength++;
     }
 
-    const bytes: number[] = [];
-    let i = 0;
-    while (i <= lastIndex) {
-        const wall = row[i];
-        const isEmpty = wall.texture === null && wall.mirror === false;
+    if (runLength === 1) return {bytes: [BYTE_EMPTY], nextIndex: startIndex + 1};
+    if (runLength === 2) return {bytes: [BYTE_EMPTY, BYTE_EMPTY], nextIndex: startIndex + 2};
 
-        if (isEmpty) {
-            let run = 1;
-            while (
-                i + run <= lastIndex &&
-                row[i + run].texture === null &&
-                row[i + run].mirror === false &&
-                run < 255
-                ) {
-                run++;
-            }
+    return {bytes: [BYTE_RLE, runLength], nextIndex: startIndex + runLength};
+};
 
-            if (run === 1) {
-                bytes.push(BYTE_EMPTY);
-                i++;
-            } else if (run === 2) {
-                bytes.push(BYTE_EMPTY, BYTE_EMPTY);
-                i += 2;
-            } else {
-                bytes.push(BYTE_RLE, run);
-                i += run;
-            }
+const encodeWallRow = (row: WallState[]): number[] => {
+    let lastValidIndex = row.length - 1;
+    while (lastValidIndex >= 0 && isEmptyWall(row[lastValidIndex])) {
+        lastValidIndex--;
+    }
+
+    const encodedBytes: number[] = [];
+    let currentIndex = 0;
+
+    while (currentIndex <= lastValidIndex) {
+        const currentWall = row[currentIndex];
+
+        if (isEmptyWall(currentWall)) {
+            const {bytes, nextIndex} = encodeEmptyWallSequence(row, currentIndex, lastValidIndex);
+            encodedBytes.push(...bytes);
+            currentIndex = nextIndex;
         } else {
-            bytes.push(encodeWallByte(wall));
-            i++;
+            encodedBytes.push(encodeWallByte(currentWall));
+            currentIndex++;
         }
     }
 
-    bytes.push(BYTE_END_ROW);
-    return bytes;
+    encodedBytes.push(BYTE_END_ROW);
+    return encodedBytes;
 };
 
 export const serializeMapToBinary = (map: Map): Uint8Array => {

@@ -8,10 +8,12 @@ import useMapLoader from './hooks/useMapLoader';
 import {serializeMapToBinary} from './hooks/serializeMapToBinary.ts';
 
 const emptyWall = {texture: null, mirror: false};
-const emptyMap: Map = {
-    hWalls: Array(32).fill(null).map(() => Array(32).fill(emptyWall)),
-    vWalls: Array(32).fill(null).map(() => Array(31).fill(emptyWall)),
-    cells: Array(32).fill(null).map(() => Array(32).fill({object: null})),
+const makeEmptyMap = (): Map => {
+    return {
+        hWalls: Array(32).fill(null).map(() => Array(32).fill(emptyWall)),
+        vWalls: Array(32).fill(null).map(() => Array(31).fill(emptyWall)),
+        cells: Array(32).fill(null).map(() => Array(32).fill({object: null})),
+    };
 };
 
 const App: React.FC = () => {
@@ -19,7 +21,7 @@ const App: React.FC = () => {
     const [selectedObject, setSelectedObject] = useState<number | null>(null);
     const [map, setMap] = useState<Map>(() => {
         const raw = localStorage.getItem('map');
-        return raw ? JSON.parse(raw) : emptyMap;
+        return raw ? JSON.parse(raw) : makeEmptyMap();
     });
     const {loadFromFile} = useMapLoader();
 
@@ -38,6 +40,12 @@ const App: React.FC = () => {
         binLink.click();
         URL.revokeObjectURL(binUrl);
     }, [map]);
+
+    const newMap = () => {
+        if (confirm('Sure? All unsaved changes will be lost.')) {
+            setMap(makeEmptyMap());
+        }
+    };
 
 
     const handleLoad = (file: File) => {
@@ -70,6 +78,7 @@ const App: React.FC = () => {
                     selected={selectedObject}
                 />
                 <div className="controls">
+                    <button onClick={newMap}>New</button>
                     <button onClick={() => document.getElementById('file-input')?.click()}>Load</button>
                     <input
                         id="file-input"
