@@ -80,6 +80,12 @@ const encodeWallRow = (row: WallState[]): number[] => {
 };
 
 export const serializeMapToBinary = (map: Map): Uint8Array => {
+    const mapCopy: Map = {
+        hWalls: map.hWalls.map(row => row.map(wall => ({...wall}))),
+        vWalls: map.vWalls.map(row => row.map(wall => ({...wall}))),
+        cells: map.cells.map(row => row.map(cell => ({...cell}))),
+    };
+
     const buffer: number[] = [];
 
     let objectsAmount = 0;
@@ -87,18 +93,18 @@ export const serializeMapToBinary = (map: Map): Uint8Array => {
     let startX = -1, startY = -1;
     for (let y = 0; y < MAP_SIZE; y++) {
         for (let x = 0; x < MAP_SIZE; x++) {
-            const obj = map.cells[y][x].object;
+            const obj = mapCopy.cells[y][x].object;
             if (obj === 29) {
                 exitX = x;
                 exitY = y;
-                map.cells[y][x].object = null;
+                mapCopy.cells[y][x].object = null;
             }
             if (obj === 31) {
                 startX = x;
                 startY = y;
-                map.cells[y][x].object = null;
+                mapCopy.cells[y][x].object = null;
             }
-            if (map.cells[y][x].object !== null) {
+            if (mapCopy.cells[y][x].object !== null) {
                 objectsAmount++;
             }
         }
@@ -122,7 +128,7 @@ export const serializeMapToBinary = (map: Map): Uint8Array => {
     // Объекты на карте (кроме старт/выход)
     for (let y = 0; y < MAP_SIZE; y++) {
         for (let x = 0; x < MAP_SIZE; x++) {
-            const obj = map.cells[y][x].object;
+            const obj = mapCopy.cells[y][x].object;
             if (obj != null) {
                 buffer.push(
                     0x80, x,
@@ -138,10 +144,10 @@ export const serializeMapToBinary = (map: Map): Uint8Array => {
 
     // Стены
     for (let y = 0; y < MAP_SIZE; y++) {
-        const hRow = encodeWallRow(map.hWalls[y]);
+        const hRow = encodeWallRow(mapCopy.hWalls[y]);
         buffer.push(...hRow);
 
-        const vRow = encodeWallRow(map.vWalls[y]);
+        const vRow = encodeWallRow(mapCopy.vWalls[y]);
         buffer.push(...vRow);
     }
 

@@ -1,5 +1,5 @@
 import {useCallback} from 'react';
-import {serializeMapToBinary} from '../hooks/serializeMapToBinary.ts';
+import {serializeMapToBinary} from '../utils/serializeMapToBinary.ts';
 import {makeEmptyMap} from '../utils/makeEmptyMap.ts';
 import {useEditorStore} from '../store/EditorStore.ts';
 import useMapLoader from '../hooks/useMapLoader.ts';
@@ -15,7 +15,7 @@ export const FileControls = () => {
         const binUrl = URL.createObjectURL(binBlob);
         const binLink = document.createElement('a');
         binLink.href = binUrl;
-        binLink.download = 'map.bin';
+        binLink.download = 'mapatm.E';
         binLink.click();
         URL.revokeObjectURL(binUrl);
     }, [map]);
