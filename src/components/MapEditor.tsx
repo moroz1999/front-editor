@@ -5,6 +5,7 @@ import VWall from './VWall';
 import './MapEditor.css';
 import type {Map} from '../types/Map.ts';
 import {useEditorStore} from '../store/EditorStore.ts';
+import {MAP_SIZE} from '../types/constants.ts';
 
 type WallType = 'vWall' | 'hWall'
 type ElementType = 'cell' | WallType
@@ -64,7 +65,7 @@ const MapEditor: React.FC = () => {
             return;
         }
 
-        if ((type === 'vWall' && x >= 31) || (!selectedTextureNumber && isLeftClick)) return;
+        if ((type === 'vWall' && x >= MAP_SIZE - 1) || (!selectedTextureNumber && isLeftClick)) return;
 
         const toggle =
             isLeftClick &&
@@ -110,7 +111,7 @@ const MapEditor: React.FC = () => {
                     row.map((cell, xi) => (xi === x && yi === y ? {...cell, object: selectedObjectNumber} : cell)),
                 ),
             });
-        } else if (type !== 'cell' && selectedTextureNumber && !(type === 'vWall' && x >= 31)) {
+        } else if (type !== 'cell' && selectedTextureNumber && !(type === 'vWall' && x >= MAP_SIZE - 1)) {
             const newMap = updateWall(map, x, y, type as WallType, selectedTextureNumber, false);
             setMap(newMap);
         }
@@ -156,7 +157,7 @@ const MapEditor: React.FC = () => {
                                     .fill(null)
                                     .map((_, x) => (
                                         <React.Fragment key={`cell-${x}-${y}`}>
-                                            {x < 31 && (
+                                            {x < 32 && (
                                                 <VWall
                                                     texture={map.vWalls[y][x].texture}
                                                     mirror={map.vWalls[y][x].mirror}

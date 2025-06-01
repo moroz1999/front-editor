@@ -1,7 +1,7 @@
 import type {Map} from '../types/Map.ts';
 import type {WallState} from '../types/WallState.ts';
+import {MAP_SIZE} from '../types/constants.ts';
 
-const MAP_SIZE = 32;
 const BYTE_EMPTY = 0x20;
 const BYTE_EMPTY_MIRRORED = 0xC1;
 const BYTE_END_ROW = 0x0d;

@@ -20,6 +20,6 @@ export const Status = () => {
             style={texture?.image ? {backgroundImage: `url(${texture?.image}`} : undefined}
         ></div>
         {hoveredObject && <>{hoveredObject.x}:{hoveredObject.y}</>}
-        {objectsAmount && <div>{objectsAmount} objects</div>}
+        <div>{objectsAmount} objects</div>
     </>;
 };
