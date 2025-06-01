@@ -1,6 +1,7 @@
 import React from 'react';
 import './VWall.css';
 import {getTextureByNumber} from './mapTextures.ts';
+import {useEditorStore} from '../store/EditorStore.ts';
 
 interface WallProps {
     texture: number | null;
@@ -10,7 +11,8 @@ interface WallProps {
 }
 
 const VWall: React.FC<WallProps> = ({texture, mirror, onMouseDown, onMouseEnter}) => {
-    const selectedTexture = getTextureByNumber(texture);
+    const texturePack = useEditorStore(state => state.texturePack);
+    const selectedTexture = getTextureByNumber(texture, texturePack);
 
     const hasImage = selectedTexture?.image;
     const className = `v-wall ${mirror ? ' v-mirrored' : ''} ${hasImage ? ' v-has-image' : ''}`;

@@ -1,0 +1,25 @@
+import type {MapTextureSelectorValue} from '../MapTextureSelectorValue.ts';
+
+export const BUNKER_TEXTURES: MapTextureSelectorValue[] = [
+    {number: null, image: null},
+    {number: 16, image: '/textures/bunker/00.bmp'},
+    {number: 17, image: '/textures/bunker/01.bmp'},
+    {number: 18, image: '/textures/bunker/02.bmp'},
+    {number: 19, image: '/textures/bunker/03.bmp'},
+    {number: 20, image: '/textures/bunker/04.bmp'},
+    {number: 21, image: '/textures/bunker/05.bmp'},
+    {number: 22, image: '/textures/bunker/06.bmp'},
+    {number: 23, image: '/textures/bunker/07.bmp'},
+    {number: 24, image: '/textures/bunker/08.bmp'},
+    {number: 25, image: '/textures/bunker/09.bmp'},
+    {number: 26, image: '/textures/bunker/10.bmp'},
+    {number: 27, image: '/textures/bunker/11.bmp'},
+    {number: 28, image: '/textures/bunker/12.bmp'},
+    {number: 29, image: '/textures/bunker/13.bmp'},
+    {number: 30, image: '/textures/bunker/14.bmp'},
+    {number: 31, image: '/textures/bunker/15.bmp'},
+    {number: 32, image: '/textures/bunker/16.bmp'},
+    {number: 33, image: '/textures/bunker/17.bmp'},
+    {number: 34, image: '/textures/bunker/18.bmp'},
+    {number: 35, image: '/textures/bunker/19.bmp'},
+];

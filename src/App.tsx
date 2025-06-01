@@ -6,6 +6,8 @@ import './App.css';
 import {useEditorStore} from './store/EditorStore.ts';
 import {ZoomSelector} from './components/ZoomSelector.tsx';
 import {FileControls} from './components/FileControls.tsx';
+import {TexturePackSelector} from './components/TexturePackSelector.tsx';
+import {Status} from './components/Status.tsx';
 
 const App: React.FC = () => {
     const zoom = useEditorStore(state => state.zoom);
@@ -17,9 +19,11 @@ const App: React.FC = () => {
             </div>
             <div className="sidebar">
                 <ZoomSelector/>
+                <TexturePackSelector/>
                 <TextureSelector/>
                 <ObjectSelector/>
                 <FileControls/>
+                <Status/>
             </div>
         </div>
     );

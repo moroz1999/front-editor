@@ -15,7 +15,7 @@ const MapEditor: React.FC = () => {
     const selectedTextureNumber = useEditorStore((state) => state.selectedTextureNumber);
     const selectedObjectNumber = useEditorStore((state) => state.selectedObjectNumber);
     const isMouseDown = useRef(false);
-
+    const setHoveredObject = useEditorStore((state) => state.setHoveredObject);
     const updateWall = (
         m: Map,
         x: number,
@@ -75,6 +75,32 @@ const MapEditor: React.FC = () => {
     };
 
     const handleMouseEnterAction = (x: number, y: number, type: ElementType): void => {
+        if (type === 'hWall') {
+            setHoveredObject({
+                x,
+                y,
+                number: map.hWalls[y][x].texture,
+                type: 'wall',
+                mirrored: map.hWalls[y][x].mirror,
+            });
+        } else if (type === 'vWall') {
+            setHoveredObject({
+                x,
+                y,
+                number: map.vWalls[y][x].texture,
+                type: 'wall',
+                mirrored: map.vWalls[y][x].mirror,
+            });
+        } else if (type === 'cell') {
+            setHoveredObject({
+                x,
+                y,
+                number: map.cells[y][x].object,
+                type: 'cell',
+                mirrored: false,
+            });
+        }
+
         if (!isMouseDown.current) return;
 
         if (type === 'cell' && selectedObjectNumber) {

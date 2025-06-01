@@ -1,0 +1,6 @@
+.texture {
+    width: 128px;
+    height: 128px;
+    background-size: 100%;
+    image-rendering: pixelated;
+}

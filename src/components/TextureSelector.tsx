@@ -1,14 +1,20 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import './TextureSelector.css';
-import {MAP_TEXTURES} from './mapTextures.ts';
 import {useEditorStore} from '../store/EditorStore.ts';
+import {BUNKER_TEXTURES} from '../types/textures/BUNKER_TEXTURES.ts';
+import {TRENCHES_TEXTURES} from '../types/textures/TRENCHES_TEXTURES.ts';
+import {TexturePack} from '../types/TexturePack.ts';
 
 const TextureSelector: React.FC = () => {
     const selectedTextureNumber = useEditorStore((state) => state.selectedTextureNumber);
     const setSelectedTextureNumber = useEditorStore((state) => state.setSelectedTextureNumber);
+    const texturePack = useEditorStore((state) => state.texturePack);
+    const textures = useMemo(() => {
+        return texturePack === TexturePack.BUNKER ? BUNKER_TEXTURES : TRENCHES_TEXTURES;
+    }, [texturePack]);
     return (
         <div className="texture-selector">
-            {MAP_TEXTURES.map((texture) => (
+            {textures.map((texture) => (
                 <div
                     key={texture.number}
                     className={'texture-selector-item ' + (selectedTextureNumber === texture.number ? 'selected' : '')}
